@@ -1,3 +1,10 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Quizes.Api.Data;
+using Quizes.Api.Data.Entities;
+using Quizes.Api.Endpoints;
+using Quizes.Api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,8 +12,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+builder
+    .Services
+    .AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
+builder
+    .Services
+    .AddDbContext<QuizContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("Quiz")));
+builder
+    .Services
+    .AddTransient<AuthService>();
 
+var app = builder.Build();
+#if DEBUG
+ApplyDbMigrations(app.Services);
+#endif
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -15,30 +35,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+app.MapAuthEndpoints();
 
 app.Run();
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+static void ApplyDbMigrations(IServiceProvider sp)
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    var scope = sp.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<QuizContext>();
+
+    if (dbContext.Database.GetPendingMigrations().Any())
+        dbContext.Database.Migrate();
 }

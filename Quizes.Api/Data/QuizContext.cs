@@ -37,6 +37,7 @@ namespace Quizes.Api.Data
 
             var admin = new User
             {
+                Id = 1,
                 Name = "Gyuntek Ahmed",
                 Email = "admin@mail.com",
                 Phone = "0893794549",

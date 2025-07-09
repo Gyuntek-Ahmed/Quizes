@@ -362,5 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-Quizes.Web.Api/appsettings.json
-Quizes.Web.Api/appsettings.Development.json
+Quizes.Api/appsettings.json
+Quizes.Api/appsettings.Development.json

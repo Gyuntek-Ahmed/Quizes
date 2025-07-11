@@ -10,3 +10,12 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@inject QuizAuthStateProvider QuizAuthStateProvider
+
+@code{
+    override protected async Task OnInitializedAsync()
+    {
+        await QuizAuthStateProvider.InitializeAsync();
+    }
+}

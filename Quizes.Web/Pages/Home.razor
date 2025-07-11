@@ -1,7 +1,28 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@inject QuizAuthStateProvider QuizAuthStateProvider
 
-<h1>Hello, world!</h1>
+<PageTitle>Начало</PageTitle>
+
+<h1>Здравейте, @QuizAuthStateProvider.User?.Name</h1>
 
 Welcome to your new app.
+
+<AuthorizeView>
+    <Authorizing>
+        <p>Зареждане...</p>
+    </Authorizing>
+
+    <Authorized>
+        <p>Вие сте влезли в системата: @context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value</p>
+    </Authorized>
+
+    <NotAuthorized>
+        <p>Вие не сте влезли в системата.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code
+{
+
+}

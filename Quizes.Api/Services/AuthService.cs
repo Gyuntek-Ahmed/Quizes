@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Quizes.Api.Data;
 using Quizes.Api.Data.Entities;
+using Quizes.Shared;
 using Quizes.Shared.Dtos;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -42,7 +43,8 @@ namespace Quizes.Api.Services
             }
 
             var token = GenerateJwtToken(user);
-            return new AuthResponseDto(token);
+            var loggedInUser = new LoggedInUser(user.Id, user.Name, user.Role, token);
+            return new AuthResponseDto(loggedInUser);
         }
 
         private string GenerateJwtToken(User user)
@@ -56,7 +58,7 @@ namespace Quizes.Api.Services
 
             var secret = _configuration.GetValue<string>("Jwt:Secret");
 
-            var symetrycKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secret));
+            var symetrycKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secret!));
 
             var signingCred = new SigningCredentials(symetrycKey, SecurityAlgorithms.HmacSha256);
 

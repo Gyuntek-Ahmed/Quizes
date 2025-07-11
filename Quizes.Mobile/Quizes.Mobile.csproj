@@ -55,6 +55,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="DevExpress.Blazor" Version="20.2.4" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />

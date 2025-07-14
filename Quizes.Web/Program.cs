@@ -32,10 +32,27 @@ await builder.Build().RunAsync();
 
 static void ConfigureRefit(IServiceCollection services)
 {
-    //const string baseUrl = "https://tkz3266f-7183.euw.devtunnels.ms/";
-    const string baseUrl = "https://localhost:7183";
+    //const string ApiBaseUrl = "https://tkz3266f-7183.euw.devtunnels.ms/";
+    const string ApiBaseUrl = "https://localhost:7183";
 
     services
         .AddRefitClient<IAuthApi>()
-        .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl));
+        .ConfigureHttpClient(SetHttpClient);
+    services
+        .AddRefitClient<ICategoryApi>(GetRefitSettings)
+        .ConfigureHttpClient(SetHttpClient);
+
+    static void SetHttpClient(HttpClient httpClient)
+        => httpClient.BaseAddress = new Uri(ApiBaseUrl);
+
+    static RefitSettings GetRefitSettings(IServiceProvider sp)
+    {
+        var authStateProvider = sp.GetRequiredService<QuizAuthStateProvider>();
+        var a = Task.FromResult(authStateProvider.User?.Token ?? "");
+
+        return new RefitSettings
+        {
+            AuthorizationHeaderValueGetter = (_, __) => Task.FromResult(authStateProvider.User?.Token ?? "")
+        };
+    }
 }

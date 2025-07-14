@@ -9,8 +9,6 @@ using Quizes.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -23,7 +21,8 @@ builder
         options.UseSqlServer(builder.Configuration.GetConnectionString("Quiz")));
 builder
     .Services
-    .AddTransient<AuthService>();
+    .AddTransient<AuthService>()
+    .AddTransient<CategoryService>();
 builder
     .Services
     .AddAuthentication(options =>
@@ -46,6 +45,9 @@ builder
             ValidateIssuerSigningKey = true,
         };
     });
+builder
+    .Services
+    .AddAuthorization();
 builder
     .Services
     .AddCors(options =>
@@ -75,8 +77,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors();
-app.UseAuthentication();
-app.MapAuthEndpoints();
+app
+    .UseAuthentication()
+    .UseAuthorization();
+app
+    .MapAuthEndpoints()
+    .MapCategoryEndpoints();
 
 app.Run();
 

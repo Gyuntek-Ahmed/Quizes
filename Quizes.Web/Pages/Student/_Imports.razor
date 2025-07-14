@@ -1,0 +1,4 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using Quizes.Shared
+
+@attribute [Authorize(Roles = nameof(UserRole.Student))]

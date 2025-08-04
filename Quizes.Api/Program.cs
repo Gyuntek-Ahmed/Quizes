@@ -22,7 +22,8 @@ builder
 builder
     .Services
     .AddTransient<AuthService>()
-    .AddTransient<CategoryService>();
+    .AddTransient<CategoryService>()
+    .AddTransient<QuizService>();
 builder
     .Services
     .AddAuthentication(options =>
@@ -82,7 +83,8 @@ app
     .UseAuthorization();
 app
     .MapAuthEndpoints()
-    .MapCategoryEndpoints();
+    .MapCategoryEndpoints()
+    .MapQuizEndpoints();
 
 app.Run();
 

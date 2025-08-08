@@ -9,6 +9,13 @@ namespace Quizes.Web.Apis.Interfaces
         [Post("/api/quizes")]
         Task<QuizApiResponse> SaveQuizAsync(QuizSaveDto dto);
 
-        //Task<QuizApiResponse> DeleteQuizAsync(Guid id);
+        [Get("/api/quizes")]
+        Task<QuizListDto[]> GetQuizesAsync();
+
+        [Get("/api/quizes/{quizId}/questions")]
+        Task<QuestionDto[]> GetQuizQuestionsAsync(Guid quizId);
+
+        [Get("/api/quizes/{quizId}")]
+        Task<QuizSaveDto?> GetQuizToEditAsync(Guid quizId);
     }
 }

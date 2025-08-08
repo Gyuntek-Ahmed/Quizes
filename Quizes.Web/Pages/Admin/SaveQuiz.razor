@@ -1,11 +1,12 @@
 ﻿@page "/admin/add-quiz"
+@page "/admin/edit-quiz/{quizId:guid?}"
 
 @inject IQuizApi QuizApi
 @inject ICategoryApi CategoryApi
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
-<h1>Добави Тест</h1>
+<h1>@(IsEditCase ? "Редактирай Тест" : "Добави Тест")</h1>
 <hr>
 
 <EditForm Model="_quiz" OnValidSubmit="SaveQuizAsync">
@@ -62,10 +63,10 @@
                                 <div class="input-group">
                                     <div class="input-group-text">
                                         <input class="form-check-input mt-0"
-                                        type="radio"
-                                        name="option_radio_@random"
-                                        @onchange="() => SetOptionAsCorrectAnswer(q, option)"
-                                        checked="@option.IsCorrect">
+                                               type="radio"
+                                               name="option_radio_@random"
+                                               @onchange="() => SetOptionAsCorrectAnswer(q, option)"
+                                               checked="@option.IsCorrect">
                                     </div>
                                     <input type="text" class="form-control" @bind="option.Text">
                                     <button class="btn btn-danger" type="button" @onclick="() => q.Options.Remove(option)">X</button>
@@ -99,14 +100,31 @@
 </EditForm>
 
 @code {
+    [Parameter]
+    public Guid? QuizId { get; set; }
+    private bool IsEditCase => QuizId.HasValue && QuizId.Value != Guid.Empty;
     private QuizSaveDto _quiz = new QuizSaveDto();
     private CategoryDto[] _categories = [];
 
     protected override async Task OnInitializedAsync()
     {
-        var question = GetDefaultEmptyQuestion();
+        if (IsEditCase)
+        {
+            var quiz = await QuizApi.GetQuizToEditAsync(QuizId!.Value);
+            if (_quiz == null)
+            {
+                await ShowAlertMessageAsync("Тестът не е намерен!");
+                NavigationManager.NavigateTo("admin/manage-quizzes");
+                return;
+            }
+            _quiz = quiz;
+        }
+        else
+        {
+            var question = GetDefaultEmptyQuestion();
+            _quiz.Questions = [question];
+        }
 
-        _quiz.Questions = [question];
         _categories = await CategoryApi.GetCategoriesAsync();
     }
 
